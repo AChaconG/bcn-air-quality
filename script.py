@@ -54,7 +54,36 @@ df = pd.concat(frames, keys = ['jan19', 'feb19', 'mar19', 'jan20', 'feb20', 'mar
 # generat: date of colection of the data. Data i hora de generació de la informació en origen
 # dateTime: Time Stamp de l'hora de descàrrega del fitxer
 
-# IN DEPTH DESCRIPTION OF IMPORTANT FIELDS
+# IN DEPTH ANALYSIS OF IMPORTANT FIELDS
+
+## MEASUREMENTS
+#analyze data about pollution only, to better understand values:
+pollutants = df[['qualitat_aire','qualitat_o3', 'valor_o3','qualitat_no2', 'valor_no2', 'qualitat_pm10', 'valor_pm10']]
+#print(pollutants.head(50))
+# check if the quality of air takes the said values.
+#print('number quality ranges', pollutants.qualitat_aire.unique())
+#it takes values of Good, Moderate, Bad, and '--' (this last one was not mentioned before)
+#From observing the data, it seems that the Quality of air and other quality indecators are redundant, because:
+# Air quality will take the qualification of good or moderate even if only one of the values of measurement is present
+is_airq_bad = pollutants['qualitat_aire'] == 'Pobra'
+airq_bad = pollutants[is_airq_bad]
+#print(airq_bad)
+# If one of the measurements is bad, the general air quality will be assigned as bad
+is_airq_good = pollutants['qualitat_aire'] == 'Bona'
+airq_good = pollutants[is_airq_good]
+#print(airq_good.head(50))
+# Now for '--'
+is_airq_nonexistant = pollutants['qualitat_aire'] == '--'
+airq_nonex = pollutants[is_airq_nonexistant]
+#print(airq_nonex.head(50))
+#all of this need to go (later)
+#i will discard the columns for qualitative values. the values for qualitative measures should be more strict.
+
+
+
+# Range of each measurement.
+
+
 ## TIME
 
 #print(df[['hora_o3','qualitat_o3', 'valor_o3' ]])
@@ -65,24 +94,20 @@ times = df[['hora_o3', 'hora_no2', 'hora_pm10', 'generat']]
 
 #there are inconsistencies in the times. for example:
 #in the line 49: sais o3 was taken at 3h, n02 as 3h and pm at 5h, but the time says 6:00. let's first
+#this is not further explained in the info of the data. if that happens, we might want to discard that data.
 
-## MEASUREMENTS
-#analyxe data abut pollution only, to better understand values:
-pollutants = df[['qualitat_aire','qualitat_o3', 'valor_o3','qualitat_no2', 'valor_no2', 'qualitat_pm10', 'valor_pm10']]
-#print(pollutants.head(50))
-#From observing the data, it seems that the Quality of air and other quality indecators are redundant, because:
-# 1. it only takes values of Good and Moderate (Bona and regular, Pobra, '--')
-#print('number quality ranges', pollutants.qualitat_aire.unique())
-#print(pollutants.qualitat_aire == 'Pobra')
-# 2. Air quality will take the qualification of good or moderate even if only one of the values of measurement is present
-is_airq_bad = pollutants['qualitat_aire'] == 'Pobra'
-airq_bad = pollutants[is_airq_bad]
-#print(airq_bad)
+#CLEANING DATA
 
-#why some values are '--':
-#print(pollutants[pollutants['qualitat_aire'] == '--'])
+#remove column of qualitative data. keep lcation and values
+#print(df.head(50))
+#print(df.columns)
+df1 = df[['nom_cabina', 'longitud', 'latitud', 'hora_o3', 'valor_o3', 'hora_no2', 'valor_no2', 'hora_pm10', 'valor_pm10', 'generat']]
+#print(df1.head(50))
+df1.info()
+#son, from all 34920 rows of data, the o3 value is the one that is less present in the data.
+#are there full empty rows?
 
-
+#"generat", and 'hours are not datatype
 
 #check info datasets
 #print(df.info)
